@@ -14,7 +14,13 @@ spring:
           filters:
             # We preserve the host header so we don't accidentally send 'localhost' to OpenAI
             - PreserveHostHeader
-            # We will add custom filters for inspection and rate limiting here soon
+            # Custom Inspection Filter
+            - InspectionFilter
+  kafka:
+    bootstrap-servers: localhost:9092
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 logging:
   level:
