@@ -24,7 +24,7 @@
         <module>gateway-service</module>
         <module>inspection-service</module>
         <module>outbound-scanner</module>
-        <!-- <module>policy-service</module> -->
+        <module>policy-service</module>
         <!-- <module>telemetry-service</module> -->
     </modules>
     <dependencyManagement>
