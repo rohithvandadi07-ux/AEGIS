@@ -21,7 +21,7 @@
     </properties>
     <modules>
         <!-- We will uncomment these as we create them -->
-        <!-- <module>gateway-service</module> -->
+        <module>gateway-service</module>
         <!-- <module>inspection-service</module> -->
         <!-- <module>outbound-scanner</module> -->
         <!-- <module>policy-service</module> -->

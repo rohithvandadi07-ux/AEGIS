@@ -1,0 +1,22 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: gateway-service
+  cloud:
+    gateway:
+      routes:
+        - id: openai_chat_completions
+          uri: https://api.openai.com
+          predicates:
+            - Path=/v1/chat/completions
+          filters:
+            # We preserve the host header so we don't accidentally send 'localhost' to OpenAI
+            - PreserveHostHeader
+            # We will add custom filters for inspection and rate limiting here soon
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    reactor.netty: INFO
