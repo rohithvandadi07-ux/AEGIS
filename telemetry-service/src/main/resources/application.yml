@@ -1,0 +1,23 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: telemetry-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/aegis_db
+    username: aegis
+    password: password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: aegis-telemetry-group
+      auto-offset-reset: earliest
+
+logging:
+  level:
+    com.aegis: DEBUG
