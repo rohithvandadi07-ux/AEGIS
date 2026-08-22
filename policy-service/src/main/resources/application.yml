@@ -5,7 +5,7 @@ spring:
   application:
     name: policy-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/aegis_db
+    url: jdbc:postgresql://postgres:5432/aegis_db
     username: aegis
     password: password
   jpa:

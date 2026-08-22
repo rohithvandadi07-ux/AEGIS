@@ -35,8 +35,8 @@ public class InspectionFilter extends AbstractGatewayFilterFactory<InspectionFil
                             ObjectMapper objectMapper,
                             ModifyRequestBodyGatewayFilterFactory modifyRequestBodyFilterFactory) {
         super(Config.class);
-        // Assuming inspection-service runs on localhost:8081 for MVP
-        this.webClient = webClientBuilder.baseUrl("http://localhost:8081").build();
+        // Using Docker DNS hostname for MVP
+        this.webClient = webClientBuilder.baseUrl("http://inspection-service:8081").build();
         this.telemetryProducer = telemetryProducer;
         this.objectMapper = objectMapper;
         this.modifyRequestBodyFilterFactory = modifyRequestBodyFilterFactory;
