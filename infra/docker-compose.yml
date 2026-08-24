@@ -89,5 +89,12 @@ services:
       - postgres
       - kafka
 
+  dashboard:
+    build:
+      context: ../dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "3000:80"
+
 volumes:
   pgdata:

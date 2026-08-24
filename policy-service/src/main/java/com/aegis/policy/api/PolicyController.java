@@ -9,6 +9,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/policies")
+@CrossOrigin(origins = "*")
 public class PolicyController {
 
     private final PolicyRepository policyRepository;
