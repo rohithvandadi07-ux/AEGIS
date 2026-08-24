@@ -1,9 +1,25 @@
 server:
   port: 8081
 
+openai:
+  api:
+    key: ${OPENAI_API_KEY:dummy-key}
+
 spring:
   application:
     name: inspection-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/aegis_db}
+    username: ${SPRING_DATASOURCE_USERNAME:aegis}
+    password: ${SPRING_DATASOURCE_PASSWORD:password}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
 
 logging:
   level:

@@ -1,6 +1,7 @@
 package com.aegis.inspection.api;
 
 import com.aegis.inspection.engine.HeuristicEngine;
+import com.aegis.inspection.engine.SemanticEngine;
 import com.aegis.inspection.model.InspectionRequest;
 import com.aegis.inspection.model.VerdictDecision;
 import com.aegis.inspection.model.Verdict;
@@ -20,10 +21,12 @@ public class InspectionController {
 
     private static final Logger logger = LoggerFactory.getLogger(InspectionController.class);
     private final HeuristicEngine heuristicEngine;
+    private final SemanticEngine semanticEngine;
     private final PolicyClient policyClient;
 
-    public InspectionController(HeuristicEngine heuristicEngine, PolicyClient policyClient) {
+    public InspectionController(HeuristicEngine heuristicEngine, SemanticEngine semanticEngine, PolicyClient policyClient) {
         this.heuristicEngine = heuristicEngine;
+        this.semanticEngine = semanticEngine;
         this.policyClient = policyClient;
     }
 
@@ -40,6 +43,15 @@ public class InspectionController {
         }
 
         VerdictDecision decision = heuristicEngine.analyze(request.getPrompt());
+        
+        // If Layer 1 heuristics passed, run Layer 2 Semantic checks
+        if (decision.getVerdict() == Verdict.ALLOW) {
+            VerdictDecision semanticDecision = semanticEngine.analyze(request.getPrompt());
+            if (semanticDecision.getVerdict() == Verdict.BLOCK) {
+                return ResponseEntity.ok(semanticDecision);
+            }
+        }
+        
         return ResponseEntity.ok(decision);
     }
 }

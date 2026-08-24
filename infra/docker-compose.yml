@@ -24,7 +24,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
 
   postgres:
-    image: postgres:15-alpine
+    image: pgvector/pgvector:pg15
     environment:
       POSTGRES_USER: aegis
       POSTGRES_PASSWORD: password
@@ -55,6 +55,13 @@ services:
       dockerfile: inspection-service/Dockerfile
     ports:
       - "8081:8081"
+    environment:
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-"dummy-key"}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/aegis_db
+      SPRING_DATASOURCE_USERNAME: aegis
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      - postgres
 
   outbound-scanner:
     build:
