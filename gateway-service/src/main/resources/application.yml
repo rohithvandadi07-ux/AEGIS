@@ -14,8 +14,10 @@ spring:
           filters:
             # We preserve the host header so we don't accidentally send 'localhost' to OpenAI
             - PreserveHostHeader
-            # Custom Inspection Filter
+            # Custom Inspection Filter (Inbound)
             - InspectionFilter
+            # Custom Scanner Filter (Outbound)
+            - OutboundScannerFilter
   kafka:
     bootstrap-servers: kafka:29092
     producer:

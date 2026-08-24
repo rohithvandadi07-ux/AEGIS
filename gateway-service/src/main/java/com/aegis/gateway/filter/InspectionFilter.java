@@ -49,7 +49,7 @@ public class InspectionFilter extends AbstractGatewayFilterFactory<InspectionFil
     @Override
     public GatewayFilter apply(Config config) {
         // We use ModifyRequestBody to safely read and rewrite the body
-        return modifyRequestBodyFilterFactory.apply(c -> c
+        GatewayFilter modifyFilter = modifyRequestBodyFilterFactory.apply(c -> c
                 .setRewriteFunction(String.class, String.class, (exchange, originalBody) -> {
                     if (originalBody == null) {
                         return Mono.just("");
@@ -94,13 +94,12 @@ public class InspectionFilter extends AbstractGatewayFilterFactory<InspectionFil
                                 return Mono.just(originalBody);
                             });
                 })
-        ).filter(
-            // We chain another filter to catch the BlockedRequestException and return 403
-            (exchange, chain) -> chain.filter(exchange).onErrorResume(BlockedRequestException.class, e -> {
-                exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
-                return exchange.getResponse().setComplete();
-            })
         );
+        
+        return (exchange, chain) -> modifyFilter.filter(exchange, chain).onErrorResume(BlockedRequestException.class, e -> {
+            exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+            return exchange.getResponse().setComplete();
+        });
     }
 
     private String extractPromptFromOpenAiRequest(String body) {
