@@ -23,15 +23,18 @@ public class OutboundScannerFilter extends AbstractGatewayFilterFactory<Outbound
     private final WebClient webClient;
     private final ObjectMapper objectMapper;
     private final ModifyResponseBodyGatewayFilterFactory modifyResponseBodyFilterFactory;
+    private final com.aegis.gateway.telemetry.TelemetryProducer telemetryProducer;
 
     public OutboundScannerFilter(WebClient.Builder webClientBuilder,
                                  ObjectMapper objectMapper,
-                                 ModifyResponseBodyGatewayFilterFactory modifyResponseBodyFilterFactory) {
+                                 ModifyResponseBodyGatewayFilterFactory modifyResponseBodyFilterFactory,
+                                 com.aegis.gateway.telemetry.TelemetryProducer telemetryProducer) {
         super(Config.class);
         // Using Docker DNS hostname for MVP
         this.webClient = webClientBuilder.baseUrl("http://outbound-scanner:8082").build();
         this.objectMapper = objectMapper;
         this.modifyResponseBodyFilterFactory = modifyResponseBodyFilterFactory;
+        this.telemetryProducer = telemetryProducer;
     }
 
     public static class Config {
@@ -57,6 +60,8 @@ public class OutboundScannerFilter extends AbstractGatewayFilterFactory<Outbound
                     if (tenantId == null) tenantId = "default-tenant";
 
                     ScannerRequest request = new ScannerRequest(tenantId, responseText);
+                    long startTime = System.currentTimeMillis();
+                    String finalTenantId = tenantId;
 
                     return webClient.post()
                             .uri("/api/v1/scan")
@@ -65,9 +70,15 @@ public class OutboundScannerFilter extends AbstractGatewayFilterFactory<Outbound
                             .retrieve()
                             .bodyToMono(ScannerResponse.class)
                             .map(scannerResponse -> {
+                                long latency = System.currentTimeMillis() - startTime;
                                 if (scannerResponse.isRedacted()) {
                                     logger.warn("PII Redacted from outbound response. Matched rules: {}", 
                                             scannerResponse.getDetectedSecrets());
+                                    
+                                    String matchedRules = scannerResponse.getDetectedSecrets() != null ? 
+                                            String.join(";", scannerResponse.getDetectedSecrets()) : "";
+                                    telemetryProducer.publishEvent(finalTenantId, "REDACTED", matchedRules, latency);
+
                                     // Replace the text in the original JSON
                                     return replaceTextInOpenAiResponse(originalBody, scannerResponse.getRedactedPayload());
                                 }
