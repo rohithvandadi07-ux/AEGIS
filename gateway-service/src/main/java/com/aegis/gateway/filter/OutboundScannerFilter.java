@@ -53,7 +53,10 @@ public class OutboundScannerFilter extends AbstractGatewayFilterFactory<Outbound
                         return Mono.just(originalBody);
                     }
 
-                    ScannerRequest request = new ScannerRequest(responseText);
+                    String tenantId = exchange.getRequest().getHeaders().getFirst("X-Tenant-Id");
+                    if (tenantId == null) tenantId = "default-tenant";
+
+                    ScannerRequest request = new ScannerRequest(tenantId, responseText);
 
                     return webClient.post()
                             .uri("/api/v1/scan")
